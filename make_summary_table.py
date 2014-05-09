@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #  -is it really a potential problem if velocity reference system is not 'lsr'?
 #  -why is center sky frequency as calculated with p2gTable.py different than
 #   the value in the OT GUI?
@@ -13,7 +15,8 @@
 #        SW-2: width: 1875.000MHz, 3840 channels
 #        SW-3: width: 1875.000MHz, 3840 channels ...
 
-import os, sys
+import os, sys, shutil
+import pdb
 import glob
 import math
 import xml.etree.ElementTree as ET
@@ -77,6 +80,7 @@ while not done:
 
 if aotPath != 'Q':
     #unzip XML files from aot in temporary directory
+    shutil.rmtree('nates_temp_dir', ignore_errors=True)
     os.mkdir('nates_temp_dir')
     tmpDir = os.getcwd() + '/nates_temp_dir'
     os.system('unzip -q ' + aotPath + ' -d ' + tmpDir)
@@ -170,14 +174,13 @@ if aotPath != 'Q':
                         #computing the center sky frequencies
                         velElem = child.findall(favNS + '}sourceVelocity')[0]
                         if velElem.attrib['referenceSystem'] != 'lsr':
-                            print 'WARNING'
-                            print 'Vel ref system is ' + \
-                                  velElem.attrib['referenceSystem']
-                            print 'Velocity reference system is not "lsr" ' + \
-                                  'so this script might not get the ' + \
-                                  'frequencies right. Make sure you ' + \
-                                  'carefully check the frequencies.'
-                            print 'WARNING'
+                            print 'WARNING: ' + \
+                                'Vel ref system is ' + \
+                                velElem.attrib['referenceSystem'] + '. ' + \
+                                'Velocity reference system is not "lsr" ' + \
+                                'so this script might not get the ' + \
+                                'frequencies right. Make sure you ' + \
+                                'carefully check the frequencies.'
                         dopplerCalcType.append(velElem.attrib['dopplerCalcType'])
                         centVelElem = velElem.findall('{' + \
                                                       namespaces['val'] + \
@@ -334,26 +337,21 @@ if aotPath != 'Q':
         tmp2 = tmp2[:-1] + ' GHz'
         print tmp2
         tmp2 = 'Correlator modes for ' + tmp + ' Basebands: '
-        for i in range(1, int(tmp)+1, 1):
-            for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Division Mode'])):
-                tmp2 += \
-                    tableInfo[sbName]['BB_' + str(i)]['Division Mode'][j] +  '+'
-            tmp2 = tmp2[:-1]
-            tmp2 += '/'
+        # Get all the BB keys for the dictionary, and sort them
+        bb_keys = [bb_key for bb_key in tableInfo[sbName].keys() if 'BB_' in bb_key]
+        bb_keys.sort()
+        # Print the observing mode for each BB
+        for bb_key in bb_keys:
+            #pdb.set_trace()
+            tmp2 += tableInfo[sbName][bb_key]['Division Mode'][0] + '/'
         tmp2 = tmp2[:-1]
         print tmp2
         for i in range(1, int(tmp)+1, 1):
-            if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) == 1:
-                print 'BB_' + str(i) + ': Rest Frequency: ' + tableInfo[sbName]['BB_' + str(i)]['restFrequency'][0] + ' GHz, ' + \
-                      'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][0] + 'MHz, ' + \
-                      tableInfo[sbName]['BB_' + str(i)]['N Channels'][0] + \
-                      ' channels'
-            else:
-                print 'BB_' + str(i) + ':'
-                for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
-                    print '  SW-' + str(j+1) + ': Rest Frequency: ' + tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j] + ' GHz, ' + \
-                          'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
-                          tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
+            print 'BB_' + str(i) + ':'
+            for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
+                print '  SW-' + str(j+1) + ': rest freq: ' + tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j] + ' GHz, ' + \
+                      'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
+                      tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
         print tableInfo[sbName]['T per Exec'] + \
               ' mins on source per execution, ' + \
               tableInfo[sbName]['T on Source'] + ' mins on source total'
