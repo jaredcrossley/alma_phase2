@@ -16,7 +16,6 @@
 #        SW-3: width: 1875.000MHz, 3840 channels ...
 
 import os, sys, shutil
-import pdb
 import glob
 import math
 import xml.etree.ElementTree as ET
@@ -198,9 +197,7 @@ if aotPath != 'Q':
                         #retrieve the band
                         freqSet = child.findall(favNS + '}FrequencySetup')[0]
                         tableInfo[sbName]['Band'] = \
-                            freqSet.attrib['receiverBand']
-                        tableInfo[sbName]['Band'] = \
-                            tableInfo[sbName]['Band'].split('_')[-1]
+                            freqSet.attrib['receiverBand'].split('_')[-1]
 
                         #retrieve baseband widths and numbers of channels
                         tableInfo[sbName]['Bandwidths'] = list()
@@ -217,7 +214,7 @@ if aotPath != 'Q':
                             tableInfo[sbName]['BB_' + str(index)] = \
                                 {'Bandwidth': list(), 'restFrequency': list(), 'N Channels': list(), 'Division Mode': list()}
 #                            spwElem = BB.findall(favNS + '}' + corrPrefx + 'SpectralWindow')
-                            spwElem = BB.findall(favNS + '}' + 'BL' + 'SpectralWindow')
+                            spwElem = BB.findall(favNS + '}' + corrPrefx + 'SpectralWindow')
                             for i in range(len(spwElem)):
 #effectiveBandwidth
                                 bwElem = spwElem[i].findall(favNS + '}effectiveBandwidth')[0]
@@ -342,7 +339,6 @@ if aotPath != 'Q':
         bb_keys.sort()
         # Print the observing mode for each BB
         for bb_key in bb_keys:
-            #pdb.set_trace()
             tmp2 += tableInfo[sbName][bb_key]['Division Mode'][0] + '/'
         tmp2 = tmp2[:-1]
         print tmp2
