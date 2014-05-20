@@ -47,7 +47,6 @@ def restFreq2sky(restFreq, sourceVel, doppType):
     #Kindly copied from p2gTable.py
     #restFreq in GHz, sourceVel in km/s
     c = 299792.458 #km/s
-
     skyFreq = 0.0
     if doppType == 'RELATIVISTIC':
         skyFreq = restFreq*((1 - (sourceVel/c)**2)**0.5)/(1 + (sourceVel/c))
@@ -55,7 +54,6 @@ def restFreq2sky(restFreq, sourceVel, doppType):
         skyFreq = float(restFreq*(1 - (sourceVel/c)))
     elif doppType == "OPTICAL":
         skyFreq = float(restFreq*((1 + (sourceVel/c))**-1))
-
     return skyFreq
 
 #ask for path to aot file
@@ -314,7 +312,7 @@ if aotPath != 'Q':
         print 'Includes SBs: '  + tmp
     print ''
     for sbName in tableInfo['Ordered SBs']:
-        print 'SB: ' + sbName#tableInfo[sbName]['SB Name']
+        print 'SB name: ' + sbName#tableInfo[sbName]['SB Name']
         if len(tableInfo[sbName]['Sources']) > 1:
             print 'Sources:'
             for source in sorted(tableInfo[sbName]['Sources']):
@@ -343,11 +341,12 @@ if aotPath != 'Q':
         tmp2 = tmp2[:-1]
         print tmp2
         for i in range(1, int(tmp)+1, 1):
-            print 'BB_' + str(i) + ':'
+            print 'BB' + str(i) + ':'
             for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
-                print '  SW-' + str(j+1) + ': rest freq: ' + tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j] + ' GHz, ' + \
-                      'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
-                      tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
+                print '  SPW' + str(j+1) + ': rest freq: ' + \
+                "%.2f" % float(tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j]) + ' GHz, ' + \
+                'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
+                tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
         print tableInfo[sbName]['T per Exec'] + \
               ' mins on source per execution, ' + \
               tableInfo[sbName]['T on Source'] + ' mins on source total'
