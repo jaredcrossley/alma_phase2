@@ -249,10 +249,6 @@ if aotPath != 'Q':
                                     effRF = float(effRF)
                                     effRF = '%7.3f'%effRF
                                     tableInfo[sbName]['BB_' + str(index)]['restFrequency'].append(effRF)
-#                                rfElem = rFreq.findall(favNS + '}restFrequency')[0].text
-#                                effRF = rfElem.text
-#                                effRF = '%7.3f'%effRF
-#                                tableInfo[sbName]['BB_' + str(index)]['restFrequency'].append(effRF)
 
                             index += 1
 
@@ -268,8 +264,7 @@ if aotPath != 'Q':
                                 centFreq /= 1.0e6
                             elif centFreqU == 'MHz':
                                 centFreq /= 1.0e3
-#                            #do Doppler correction when Doppler Reference
-#                            #is rest
+#                            #do Doppler correction when Doppler Reference is rest
 #                            if freqSet.attrib['dopplerReference'] == 'rest':
                             tmp = restFreq2sky(centFreq, \
                                                centerVelocity[0], \
@@ -313,6 +308,13 @@ if aotPath != 'Q':
     print ''
     for sbName in tableInfo['Ordered SBs']:
         print 'SB name: ' + sbName#tableInfo[sbName]['SB Name']
+	if (sbName.find("TE") > 1) and (sbName.find("TC") > 1):
+        	print 'Array and Correlator: 12m Compact and Extended, Baseline Correlator'
+	elif ((sbName.find("TE") > 1) and (sbName.find("TC") < 1) or (sbName.find("TE") < 1) and (sbName.find("TC") > 1)):
+        	print 'Array and Correlator: 12m, Baseline Correlator'
+	else:
+       		print 'Array and Correlator: 7m, ACA Correlator'
+
         if len(tableInfo[sbName]['Sources']) > 1:
             print 'Sources:'
             for source in sorted(tableInfo[sbName]['Sources']):
@@ -345,7 +347,7 @@ if aotPath != 'Q':
             for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
                 print '  SPW' + str(j+1) + ': rest freq: ' + \
                 "%.2f" % float(tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j]) + ' GHz, ' + \
-                'width: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
+                'nominal bandwidth: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
                 tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
         print tableInfo[sbName]['T per Exec'] + \
               ' mins on source per execution, ' + \
