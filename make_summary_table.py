@@ -198,8 +198,11 @@ if aotPath != 'Q':
                             freqSet.attrib['receiverBand'].split('_')[-1]
 
                         #retrieve baseband widths and numbers of channels
+                        #looks like these initializations may be outdated
+                        #compared to the BB_ dictionary below
                         tableInfo[sbName]['Bandwidths'] = list()
                         tableInfo[sbName]['restFrequency'] = list() #added
+                        tableInfo[sbName]['avgFactor'] = list()
                         tableInfo[sbName]['N Channels'] = list()
                         tableInfo[sbName]['Division Mode'] = list()
                         #check which correlator we're talking about here...
@@ -210,7 +213,9 @@ if aotPath != 'Q':
                         index = 1
                         for BB in corrConfig.findall(favNS + '}' + corrPrefx + 'BaseBandConfig'):
                             tableInfo[sbName]['BB_' + str(index)] = \
-                                {'Bandwidth': list(), 'restFrequency': list(), 'N Channels': list(), 'Division Mode': list()}
+                                {'Bandwidth': list(), 'restFrequency': list(), \
+                                 'avgFactor': list(), 'N Channels': list(), \
+                                 'Division Mode': list()}
 #                            spwElem = BB.findall(favNS + '}' + corrPrefx + 'SpectralWindow')
                             spwElem = BB.findall(favNS + '}' + corrPrefx + 'SpectralWindow')
                             for i in range(len(spwElem)):
@@ -240,6 +245,9 @@ if aotPath != 'Q':
                                 else:
                                     tableInfo[sbName]['BB_' + str(index)]['Division Mode'].append('FDM')
                                 tableInfo[sbName]['BB_' + str(index)]['N Channels'].append(effNChan)
+#spectralAveragingFactor
+                                avgFact = spwElem[i].findall(favNS + '}spectralAveragingFactor')[0].text
+                                tableInfo[sbName]['BB_' + str(index)]['avgFactor'].append(avgFact)
 
 #restFrequency 
                                 rFreq = spwElem[i].findall(favNS + '}SpectralLine')
@@ -344,11 +352,13 @@ if aotPath != 'Q':
         print tmp2
         for i in range(1, int(tmp)+1, 1):
             print 'BB' + str(i) + ':'
+#this assumes n channels divided by averaging factor is an integer and I'm not perfectly confident that's a guarenteed assumption
             for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
                 print '  SPW' + str(j+1) + ': rest freq: ' + \
                 "%.2f" % float(tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j]) + ' GHz, ' + \
                 'nominal bandwidth: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
-                tableInfo[sbName]['BB_' + str(i)]['N Channels'][j] + ' channels'
+                str(int(tableInfo[sbName]['BB_' + str(i)]['N Channels'][j])/int(tableInfo[sbName]['BB_' + str(i)]['avgFactor'][j])) + \
+                ' channels'
         print tableInfo[sbName]['T per Exec'] + \
               ' mins on source per execution, ' + \
               tableInfo[sbName]['T on Source'] + ' mins on source total'
