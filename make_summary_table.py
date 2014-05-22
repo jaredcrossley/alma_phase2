@@ -318,7 +318,7 @@ if aotPath != 'Q':
         print 'SB name: ' + sbName#tableInfo[sbName]['SB Name']
 	if (sbName.find("TE") > 1) and (sbName.find("TC") > 1):
         	print 'Array and Correlator: 12m Compact and Extended, Baseline Correlator'
-	elif ((sbName.find("TE") > 1) and (sbName.find("TC") < 1) or (sbName.find("TE") < 1) and (sbName.find("TC") > 1)):
+	elif ((sbName.find("TE") > 1) and (sbName.find("TC") < 1)) or ((sbName.find("TE") < 1) and (sbName.find("TC") > 1)):
         	print 'Array and Correlator: 12m, Baseline Correlator'
 	else:
        		print 'Array and Correlator: 7m, ACA Correlator'
