@@ -350,11 +350,25 @@ if aotPath != 'Q':
             tmp2 += tableInfo[sbName][bb_key]['Division Mode'][0] + '/'
         tmp2 = tmp2[:-1]
         print tmp2
+        spwNum = 0  #only used when each BB in SB contains only 1 SPW
         for i in range(1, int(tmp)+1, 1):
-            print 'BB' + str(i) + ':'
+            if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1:
+                print 'BB' + str(i) + ':'
+                nSpaces = 2
+#                spwNum = ''
+                noBB = False
+            else:
+                nSpaces = 0
+#                spwNum = str(spwNum + 1)
+                spwNum += 1
+                noBB = True
 #this assumes n channels divided by averaging factor is an integer and I'm not perfectly confident that's a guarenteed assumption
             for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
-                print '  SPW' + str(j+1) + ': rest freq: ' + \
+                if noBB:
+                    spwNumStr = str(spwNum)
+                else:
+                    spwNumStr = str(j+1)
+                print ' '*nSpaces + 'SPW' + spwNumStr + ': rest freq: ' + \
                 "%.2f" % float(tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j]) + ' GHz, ' + \
                 'effective bandwidth: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
                 str(int(tableInfo[sbName]['BB_' + str(i)]['N Channels'][j])/int(tableInfo[sbName]['BB_' + str(i)]['avgFactor'][j])) + \
