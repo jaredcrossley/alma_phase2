@@ -356,7 +356,7 @@ if aotPath != 'Q':
             for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
                 print '  SPW' + str(j+1) + ': rest freq: ' + \
                 "%.2f" % float(tableInfo[sbName]['BB_' + str(i)]['restFrequency'][j]) + ' GHz, ' + \
-                'nominal bandwidth: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
+                'effective bandwidth: ' + tableInfo[sbName]['BB_' + str(i)]['Bandwidth'][j] + ' MHz, ' + \
                 str(int(tableInfo[sbName]['BB_' + str(i)]['N Channels'][j])/int(tableInfo[sbName]['BB_' + str(i)]['avgFactor'][j])) + \
                 ' channels'
         print tableInfo[sbName]['T per Exec'] + \
