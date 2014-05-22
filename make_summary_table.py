@@ -187,7 +187,6 @@ if aotPath != 'Q':
                             centerVelocity[-1] = centerVelocity/1000.0
 
         #retrieve the spectral spec
-        tableInfo[sbName]['Sky Freqs'] = list()
         for child in root:
             if child.tag == favNS + '}SpectralSpec':
                 for gChild in child:
@@ -280,7 +279,6 @@ if aotPath != 'Q':
                                                dopplerCalcType[0])
  #                           else:
  #                               tmp = centFreq
-                            tableInfo[sbName]['Sky Freqs'].append(str(round(tmp, 1)))
 
         #retrieve the time on source per execution and total time on source
         for child in root:
@@ -317,13 +315,20 @@ if aotPath != 'Q':
     print ''
     for sbName in tableInfo['Ordered SBs']:
         print 'SB name: ' + sbName#tableInfo[sbName]['SB Name']
-	if (sbName.find("TE") > 1) and (sbName.find("TC") > 1):
-        	print 'Array and Correlator: 12m Compact and Extended, Baseline Correlator'
-	elif ((sbName.find("TE") > 1) and (sbName.find("TC") < 1)) or ((sbName.find("TE") < 1) and (sbName.find("TC") > 1)):
-        	print 'Array and Correlator: 12m, Baseline Correlator'
-	else:
-       		print 'Array and Correlator: 7m, ACA Correlator'
-
+        if sbName[-2] == 'T':
+            if sbName[-1] == 'E':
+                print 'Array and Correlator: 12m extended, Baseline Correlator'
+            elif sbName[-1] == 'C':
+                print 'Array and Correlator: 12m compact, Baseline Correlator'
+            else:
+                print 'WARNING: could not determine array and correlator ' + \
+                      'from SB name.'
+        elif sbName[-2] == '7M':
+            print 'Array and Correlator: 7m, ACA Correlator'
+        else:
+            print 'WARNING: could not determine array and correlator ' + \
+                  'from SB name.'
+                
         if len(tableInfo[sbName]['Sources']) > 1:
             print 'Sources:'
             for source in sorted(tableInfo[sbName]['Sources']):
@@ -335,14 +340,6 @@ if aotPath != 'Q':
             print 'Source: ' + tmp
             print 'Position: RA=' +  tableInfo[sbName]['Sources'][tmp]['RA'] + \
                   ' Dec=' + tableInfo[sbName]['Sources'][tmp]['Dec']
-#tableInfo[sbName]['N Basebands']
-#        tmp = str(len(tableInfo[sbName]['Sky Freqs']))
-#        tmp2 = 'Band ' + tableInfo[sbName]['Band'] + ': ' + tmp + \
-#               ' Basebands Centered at Sky Frequency '
-#        for i in range(int(tmp)):
-#            tmp2 += tableInfo[sbName]['Sky Freqs'][i] + '/'
-#        tmp2 = tmp2[:-1] + ' GHz'
-#        print tmp2
         tmp2 = 'Correlator modes for ' + \
                str(tableInfo[sbName]['N Basebands']) + ' Band ' + \
                tableInfo[sbName]['Band'] + ' basebands: '
@@ -359,11 +356,9 @@ if aotPath != 'Q':
             if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1:
                 print 'BB' + str(i) + ':'
                 nSpaces = 2
-#                spwNum = ''
                 noBB = False
             else:
                 nSpaces = 0
-#                spwNum = str(spwNum + 1)
                 spwNum += 1
                 noBB = True
 #this assumes n channels divided by averaging factor is an integer and I'm not perfectly confident that's a guarenteed assumption
@@ -384,4 +379,3 @@ if aotPath != 'Q':
 
     #remove my temporary directory
     os.system('rm -rf ' + tmpDir)
-print tableInfo['Serpens__a_06_TC']['N Basebands']
