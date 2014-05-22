@@ -210,6 +210,7 @@ if aotPath != 'Q':
                         if len(child.findall(favNS + '}' + corrPrefx + 'CorrelatorConfiguration')) == 0:
                             corrPrefx = 'ACA'
                         corrConfig = child.findall(favNS + '}' + corrPrefx + 'CorrelatorConfiguration')[0] #BLCorrelatorConfiguration
+                        tableInfo[sbName]['N Basebands'] = len(corrConfig.findall(favNS + '}' + corrPrefx + 'BaseBandConfig'))
                         index = 1
                         for BB in corrConfig.findall(favNS + '}' + corrPrefx + 'BaseBandConfig'):
                             tableInfo[sbName]['BB_' + str(index)] = \
@@ -334,14 +335,17 @@ if aotPath != 'Q':
             print 'Source: ' + tmp
             print 'Position: RA=' +  tableInfo[sbName]['Sources'][tmp]['RA'] + \
                   ' Dec=' + tableInfo[sbName]['Sources'][tmp]['Dec']
-        tmp = str(len(tableInfo[sbName]['Sky Freqs']))
-        tmp2 = 'Band ' + tableInfo[sbName]['Band'] + ': ' + tmp + \
-               ' Basebands Centered at Sky Frequency '
-        for i in range(int(tmp)):
-            tmp2 += tableInfo[sbName]['Sky Freqs'][i] + '/'
-        tmp2 = tmp2[:-1] + ' GHz'
-        print tmp2
-        tmp2 = 'Correlator modes for ' + tmp + ' Basebands: '
+#tableInfo[sbName]['N Basebands']
+#        tmp = str(len(tableInfo[sbName]['Sky Freqs']))
+#        tmp2 = 'Band ' + tableInfo[sbName]['Band'] + ': ' + tmp + \
+#               ' Basebands Centered at Sky Frequency '
+#        for i in range(int(tmp)):
+#            tmp2 += tableInfo[sbName]['Sky Freqs'][i] + '/'
+#        tmp2 = tmp2[:-1] + ' GHz'
+#        print tmp2
+        tmp2 = 'Correlator modes for ' + \
+               str(tableInfo[sbName]['N Basebands']) + ' Band ' + \
+               tableInfo[sbName]['Band'] + ' basebands: '
         # Get all the BB keys for the dictionary, and sort them
         bb_keys = [bb_key for bb_key in tableInfo[sbName].keys() if 'BB_' in bb_key]
         bb_keys.sort()
@@ -351,7 +355,7 @@ if aotPath != 'Q':
         tmp2 = tmp2[:-1]
         print tmp2
         spwNum = 0  #only used when each BB in SB contains only 1 SPW
-        for i in range(1, int(tmp)+1, 1):
+        for i in range(1, tableInfo[sbName]['N Basebands']+1, 1):
             if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1:
                 print 'BB' + str(i) + ':'
                 nSpaces = 2
@@ -380,3 +384,4 @@ if aotPath != 'Q':
 
     #remove my temporary directory
     os.system('rm -rf ' + tmpDir)
+print tableInfo['Serpens__a_06_TC']['N Basebands']
