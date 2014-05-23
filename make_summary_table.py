@@ -345,17 +345,20 @@ if aotPath != 'Q':
         # Get all the BB keys for the dictionary, and sort them
         bb_keys = [bb_key for bb_key in tableInfo[sbName].keys() if 'BB_' in bb_key]
         bb_keys.sort()
-        # Print the observing mode for each BB
+        # Print the correlator mode for each BB
         for bb_key in bb_keys:
             tmp2 += tableInfo[sbName][bb_key]['Division Mode'][0] + '/'
         tmp2 = tmp2[:-1]
         print tmp2
         spwNum = 0  #only used when each BB in SB contains only 1 SPW
+        bbFlag = False
         for i in range(1, tableInfo[sbName]['N Basebands']+1, 1):
-            if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1:
+            if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1 or \
+               bbFlag:
                 print 'BB' + str(i) + ':'
                 nSpaces = 2
                 noBB = False
+                bbFlag = True
             else:
                 nSpaces = 0
                 spwNum += 1
