@@ -332,7 +332,7 @@ if aotPath != 'Q':
         if len(tableInfo[sbName]['Sources']) > 1:
             print 'Sources:'
             for source in sorted(tableInfo[sbName]['Sources']):
-                print source + ', RA=' + \
+                print '  ' + source + ', RA=' + \
                       tableInfo[sbName]['Sources'][source]['RA'] + \
                       ' Dec=' + tableInfo[sbName]['Sources'][source]['Dec']
         else:
@@ -340,9 +340,8 @@ if aotPath != 'Q':
             print 'Source: ' + tmp
             print 'Position: RA=' +  tableInfo[sbName]['Sources'][tmp]['RA'] + \
                   ' Dec=' + tableInfo[sbName]['Sources'][tmp]['Dec']
-        tmp2 = 'Correlator modes for ' + \
-               str(tableInfo[sbName]['N Basebands']) + ' Band ' + \
-               tableInfo[sbName]['Band'] + ' basebands: '
+        tmp2 = 'Correlator modes for Band ' + tableInfo[sbName]['Band'] + \
+               ' basebands: '
         # Get all the BB keys for the dictionary, and sort them
         bb_keys = [bb_key for bb_key in tableInfo[sbName].keys() if 'BB_' in bb_key]
         bb_keys.sort()
