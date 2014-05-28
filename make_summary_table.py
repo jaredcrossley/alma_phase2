@@ -311,6 +311,7 @@ for sb in sbXMLFiles:
         str(round(tableInfo[sbName]['T per Exec'], 1))
 
 #print out the info!!!
+#print the header information
 print 'Scheduling Block Info for ' + tableInfo['Project Code']
 if len(tableInfo['Ordered SBs']) > 1:
     tmp = str(tableInfo['Ordered SBs'])
@@ -320,13 +321,24 @@ if len(tableInfo['Ordered SBs']) > 1:
     print 'Includes SBs: '  + tmp
 print ''
 
+#do a pre-check to see if SBs are all extended, compact or a mix
+mixed = False
+check = ''
+for sbName in tableInfo['Ordered SBs']:
+    if sbName[-2] == 'T':
+        check = sbName[-1]
+if len(check) > 0:
+    for sbName in tableInfo['Ordered SBs']:#modify for finding '7m'
+        if sbName[-1] != check and sbName[-1] != 'M':
+            mixed = True
+#print the correlator information
 for sbName in tableInfo['Ordered SBs']:
     print 'SB name: ' + sbName
     if sbName[-2] == 'T':
         if sbName[-1] == 'E':
-            print 'Array and Correlator: 12m extended, Baseline Correlator'
+            print 'Array and Correlator: 12m' + ' extended'*mixed + ', Baseline Correlator'
         elif sbName[-1] == 'C':
-            print 'Array and Correlator: 12m compact, Baseline Correlator'
+            print 'Array and Correlator: 12m' + ' compact'*mixed + ', Baseline Correlator'
         else:
             print 'WARNING: could not determine array and correlator ' + \
                   'from SB name.'
@@ -350,39 +362,39 @@ for sbName in tableInfo['Ordered SBs']:
     tmp2 = 'Correlator modes for Band ' + tableInfo[sbName]['Band'] + \
            ' basebands: '
     #get all the BB keys for the dictionary, and sort them
-    bb_keys = [bb_key for bb_key in tableInfo[sbName].keys() if 'BB_' in bb_key]
-    bb_keys.sort()
+    bbKeys = [bbKey for bbKey in tableInfo[sbName].keys() if 'BB_' in bbKey]
+    bbKeys.sort()
     #print the correlator mode for each BB
-    for bb_key in bb_keys:
-        tmp2 += tableInfo[sbName][bb_key]['Division Mode'][0] + '/'
+    for bbKey in bbKeys:
+        tmp2 += tableInfo[sbName][bbKey]['Division Mode'][0] + '/'
     tmp2 = tmp2[:-1]
     print tmp2
-    spwNum = 0  #only used when each BB in SB contains only 1 SPW
+    #do a pre-check to see if any BB have more than one 1 SPW
     bbFlag = False
-    for i in range(1, tableInfo[sbName]['N Basebands']+1, 1):
-        if len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth']) != 1 or \
-           bbFlag:
-            print 'BB' + str(i) + ':'
+    for bbKey in bbKeys:
+        if len(tableInfo[sbName][bbKey]['Bandwidth']) != 1:
+            bbFlag = True
+    spwNum = 0  #only used when each BB in SB contains only 1 SPW
+    for bbKey in bbKeys:
+        if bbFlag:
+            print bbKey + ':'
             nSpaces = 2
             noBB = False
-            bbFlag = True
         else:
             nSpaces = 0
             spwNum += 1
             noBB = True
-        for j in range(len(tableInfo[sbName]['BB_' + str(i)]['Bandwidth'])):
+        for j in range(len(tableInfo[sbName][bbKey]['Bandwidth'])):
             if noBB:
                 spwNumStr = str(spwNum)
             else:
                 spwNumStr = str(j+1)
             print ' '*nSpaces + 'SPW' + spwNumStr + ': rest freq: ' + \
-            "%.2f" % float(tableInfo[sbName]['BB_' + \
-                                     str(i)]['restFrequency'][j]) + ' GHz, ' + \
-            'effective bandwidth: ' + tableInfo[sbName]['BB_' + \
-                                          str(i)]['Bandwidth'][j] + ' MHz, ' + \
-            str(int(tableInfo[sbName]['BB_' + \
-                       str(i)]['N Channels'][j])/int(tableInfo[sbName]['BB_' + \
-                                                   str(i)]['avgFactor'][j])) + \
+            '%.2f' % float(tableInfo[sbName][bbKey]['restFrequency'][j]) + \
+            ' GHz, ' + 'effective bandwidth: ' + \
+            tableInfo[sbName][bbKey]['Bandwidth'][j] + ' MHz, ' + \
+            str(int(tableInfo[sbName][bbKey]['N Channels'][j])/\
+                int(tableInfo[sbName][bbKey]['avgFactor'][j])) + \
             ' channels'
     print tableInfo[sbName]['T per Exec'] + \
           ' mins on source per execution, ' + \
