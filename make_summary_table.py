@@ -170,6 +170,7 @@ for sb in sbXMLFiles:
 
     #retrieve the info on the individual source(s)
     tableInfo[sbName]['Sources'] = dict()
+    tableInfo[sbName]['Sources']['Ordered Sources'] = list()
     for child in root:
         if child.tag == favNS + '}FieldSource':
             for gChild in child:
@@ -180,6 +181,7 @@ for sb in sbXMLFiles:
                     if name != 'Primary:': continue
                     #retrieve source name
                     tableInfo[sbName]['Sources'][gChild.text] = dict()
+                    tableInfo[sbName]['Sources']['Ordered Sources'].append(gChild.text)
                     #retrieve source coordinates
                     coordElem = \
                         child.findall(favNS + '}sourceCoordinates')[0]
@@ -348,14 +350,15 @@ for sbName in tableInfo['Ordered SBs']:
         print 'WARNING: could not determine array and correlator ' + \
               'from SB name.'
                 
-    if len(tableInfo[sbName]['Sources']) > 1:
+    if len(tableInfo[sbName]['Sources']) > 2:
         print 'Sources:'
-        for source in sorted(tableInfo[sbName]['Sources']):
+        for source in tableInfo[sbName]['Sources']['Ordered Sources']:
             print '  ' + source + ', RA=' + \
                   tableInfo[sbName]['Sources'][source]['RA'] + \
                   ' Dec=' + tableInfo[sbName]['Sources'][source]['Dec']
     else:
         tmp = tableInfo[sbName]['Sources'].keys()[0]
+        if tmp == 'Ordered Sources': tmp = tableInfo[sbName]['Sources'].keys()[1]
         print 'Source: ' + tmp
         print 'Position: RA=' +  tableInfo[sbName]['Sources'][tmp]['RA'] + \
               ' Dec=' + tableInfo[sbName]['Sources'][tmp]['Dec']
