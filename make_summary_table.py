@@ -178,7 +178,8 @@ for sb in sbXMLFiles:
                     gChild.text != 'query'):
                     name = child.findall(favNS + \
                                          '}name')[0].text
-                    if name != 'Primary:': continue
+#                    if name != 'Primary:': continue  #not really sure what
+                                                      #this was for...
                     #retrieve source name
                     tableInfo[sbName]['Sources'][gChild.text] = dict()
                     tableInfo[sbName]['Sources']['Ordered Sources'].append(gChild.text)
