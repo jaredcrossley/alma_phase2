@@ -300,7 +300,7 @@ for sb in sbXMLFiles:
             elif intUnit == 'h':
                 intTime *= 60.0
             tableInfo[sbName]['T per Exec'] = \
-                intTime*len(tableInfo[sbName]['Sources'])
+                intTime*len(tableInfo[sbName]['Sources']['Ordered Sources'])
             break
     for child in root:
         if child.tag == favNS + '}SchedBlockControl':
