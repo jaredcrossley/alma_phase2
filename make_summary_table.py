@@ -59,6 +59,7 @@ def dec2sexa(RA, Dec):
 
     #convert Dec
     Dec = float(Dec)
+    sign = math.copysign(1, Dec)
     (dfrac, dw) = math.modf(Dec)
     d = int(dw)
     tmp = dfrac*60.0
@@ -66,7 +67,13 @@ def dec2sexa(RA, Dec):
     arcm = int(abs(arcm))
     arcs = (abs(arcmfrac*60.0))
 
-    return ('%02d:%02d:%05.2f'%(h, m, s), '%+03d:%02d:%05.2f'%(d, arcm, arcs))
+    #if d is 0 then negative sign of declination has to be added manually
+    if d == 0 and sign == -1.0:
+        return ('%02d:%02d:%05.2f'%(h, m, s), '-%02d:%02d:%05.2f'%(d, arcm, \
+                                                                   arcs))
+    else:
+        return ('%02d:%02d:%05.2f'%(h, m, s), '%+03d:%02d:%05.2f'%(d, arcm, \
+                                                                   arcs))
 
 #not actually used, kept around just in case...
 def restFreq2sky(restFreq, sourceVel, doppType):
