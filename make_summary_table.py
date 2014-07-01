@@ -244,6 +244,16 @@ for sb in sbXMLFiles:
                              'Division Mode': list()}
                         spwElem = BB.findall(favNS + '}' + corrPrefx + \
                                              'SpectralWindow')
+                        polAtt = spwElem[0].attrib['polnProducts']
+                        if polAtt == 'XX':
+                            tableInfo[sbName]['Polarization State'] = 'Single'
+                        elif polAtt == 'XX,YY':
+                            tableInfo[sbName]['Polarization State'] = 'Double'
+                        elif polAtt == 'XX,YY,XY,YX':
+                            tableInfo[sbName]['Polarization State'] = 'Full'
+                        else:
+                            print 'Unrecognized polarization products, this ' + \
+                                  'needs a closer look.'
                         for i in range(len(spwElem)):
                             #retrieve effective bandwidth
                             bwElem = spwElem[i].findall(favNS + \
@@ -378,7 +388,7 @@ for sbName in tableInfo['Ordered SBs']:
     #print the correlator mode for each BB
     for bbKey in bbKeys:
         tmp2 += tableInfo[sbName][bbKey]['Division Mode'][0] + '/'
-    tmp2 = tmp2[:-1]
+    tmp2 = tmp2[:-1] + ', ' + tableInfo[sbName]['Polarization State'] + ' pol.'
     print tmp2
     #do a pre-check to see if any BB have more than one 1 SPW
     bbFlag = False
