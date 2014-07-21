@@ -58,14 +58,22 @@ def dec2sexa(RA, Dec):
     s = mfrac*60.0
 
     #convert Dec
-    Dec = float(Dec)
-    sign = math.copysign(1, Dec)
-    (dfrac, dw) = math.modf(Dec)
-    d = int(dw)
-    tmp = dfrac*60.0
-    (arcmfrac, arcm) = math.modf(tmp)
-    arcm = int(abs(arcm))
-    arcs = (abs(arcmfrac*60.0))
+    sign = math.copysign(1, float(Dec))
+    spltDec = Dec.split('.')
+    d = int(spltDec[0])                 #I do these string acrobatics to avoid
+    tmp = float('0.' + spltDec[1])*60.0 #inherent roundoff erro in floats
+    tmp = str(tmp)
+    spltTmp = tmp.split('.')
+    arcm = abs(int(spltTmp[0]))
+    arcs = abs(float('0.' + spltTmp[1])*60.0)
+#    Dec = float(Dec)
+#    sign = math.copysign(1, Dec)
+#    (dfrac, dw) = math.modf(Dec)
+#    d = int(dw)
+#    tmp = dfrac*60.0
+#    (arcmfrac, arcm) = math.modf(tmp)
+#    arcm = int(abs(arcm))
+#    arcs = (abs(arcmfrac*60.0))
 
     #if d is 0 then negative sign of declination has to be added manually
     if d == 0 and sign == -1.0:
