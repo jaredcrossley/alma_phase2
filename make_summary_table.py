@@ -430,5 +430,5 @@ for sbName in tableInfo['Ordered SBs']:
           tableInfo[sbName]['T on Source'] + ' mins on source total'
     print ''
 
-#remove my temporary directory
+##remove my temporary directory
 os.system('rm -rf ' + tmpDir)
