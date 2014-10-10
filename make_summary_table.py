@@ -303,14 +303,13 @@ for sb in sbXMLFiles:
 
                             #retrieve the approximate SPW rest frequency
                             rFreq = spwElem[i].findall(favNS + '}SpectralLine')
-                            for BB in rFreq:
-                                rfElem = rFreq[0].findall(favNS + \
-                                                          '}restFrequency')[0]
-                                effRF = rfElem.text
-                                effRF = float(effRF)
-                                effRF = '%7.3f'%effRF
-                                tableInfo[sbName]['BB_' + \
-                                      str(index)]['restFrequency'].append(effRF)
+                            rfElem = rFreq[0].findall(favNS + \
+                                                      '}restFrequency')[0]
+                            effRF = rfElem.text
+                            effRF = float(effRF)
+                            effRF = '%7.3f'%effRF
+                            tableInfo[sbName]['BB_' + \
+                                  str(index)]['restFrequency'].append(effRF)
 
                         index += 1
 
