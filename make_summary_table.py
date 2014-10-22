@@ -61,7 +61,7 @@ def dec2sexa(RA, Dec):
     sign = math.copysign(1, float(Dec))
     spltDec = Dec.split('.')
     d = int(spltDec[0])                 #I do these string acrobatics to avoid
-    tmp = float('0.' + spltDec[1])*60.0 #inherent roundoff erro in floats
+    tmp = float('0.' + spltDec[1])*60.0 #inherent roundoff error in floats
     tmp = str(tmp)
     spltTmp = tmp.split('.')
     arcm = abs(int(spltTmp[0]))
@@ -191,10 +191,6 @@ for sb in sbXMLFiles:
             for gChild in child:
                 if (gChild.tag == favNS + '}sourceName' and
                     gChild.text != 'query'):
-                    name = child.findall(favNS + \
-                                         '}name')[0].text
-#                    if name != 'Primary:': continue  #not really sure what
-                                                      #this was for...
                     #retrieve source name
                     tableInfo[sbName]['Sources'][gChild.text] = dict()
                     tableInfo[sbName]['Sources']['Ordered Sources'].append(gChild.text)
@@ -222,96 +218,154 @@ for sb in sbXMLFiles:
                         tableInfo[sbName]['Sources'][gChild.text]['RA'] = 'XXX'
                         tableInfo[sbName]['Sources'][gChild.text]['Dec'] = 'XXX'
 
-    #parse the spectral spec
+    #retrieve the SpectralSpec element for the Science setup
+    gotIt = False
     for child in root:
         if child.tag == favNS + '}SpectralSpec':
             for gChild in child:
                 if gChild.tag == favNS + '}name' and \
                    'Science setup' in gChild.text:
-                    #retrieve the band
-                    freqSet = child.findall(favNS + '}FrequencySetup')[0]
-                    tableInfo[sbName]['Band'] = \
-                        freqSet.attrib['receiverBand'].split('_')[-1]
+                    gotIt = True
+                    break
+            if gotIt:
+                break
 
-                    #retrieve appropriate CorrelatorConfiguration (BL or ACA)
-                    corrPrefx = 'BL'
-                    if len(child.findall(favNS + '}' + corrPrefx + \
-                           'CorrelatorConfiguration')) == 0: corrPrefx = 'ACA'
-                    corrConfig = child.findall(favNS + '}' + corrPrefx + \
-                                               'CorrelatorConfiguration')[0]
-                    tableInfo[sbName]['N Basebands'] = \
-                        len(corrConfig.findall(favNS + '}' + corrPrefx + \
-                                               'BaseBandConfig'))
-                    index = 1
-                    #retrieve baseband configuration information
-                    for BB in corrConfig.findall(favNS + '}' + corrPrefx + \
-                                                 'BaseBandConfig'):
-                        tableInfo[sbName]['BB_' + str(index)] = \
-                            {'Bandwidth': list(), 'restFrequency': list(), \
-                             'avgFactor': list(), 'N Channels': list(), \
-                             'Division Mode': list()}
-                        spwElem = BB.findall(favNS + '}' + corrPrefx + \
-                                             'SpectralWindow')
-                        polAtt = spwElem[0].attrib['polnProducts']
-                        if polAtt == 'XX':
-                            tableInfo[sbName]['Polarization State'] = 'Single'
-                        elif polAtt == 'XX,YY':
-                            tableInfo[sbName]['Polarization State'] = 'Double'
-                        elif polAtt == 'XX,YY,XY,YX':
-                            tableInfo[sbName]['Polarization State'] = 'Full'
-                        else:
-                            print 'Unrecognized polarization products, this ' + \
-                                  'needs a closer look.'
-                        for i in range(len(spwElem)):
-                            #retrieve effective bandwidth
-                            bwElem = spwElem[i].findall(favNS + \
-                                                       '}effectiveBandwidth')[0]
-                            effBW = bwElem.text
-                            unit = bwElem.attrib['unit']
-                            if unit == 'GHz':
-                                effBW = float(effBW)*1.0e3
-                            elif unit == 'MHz':
-                                effBW = float(effBW)
-                            else:
-                                effBW = -9999.9999
-                                print "I don't know how to handle " + \
-                                      unit + " as a unit for the " + \
-                                      "effective bandwidth. Look for " + \
-                                      "a bandwidth of -999.999 in the " + \
-                                      "output table to tell which " + \
-                                      "baseband(s) need attention."
-                            effBW = '%4.3f'%effBW
-                            tableInfo[sbName]['BB_' + \
-                                          str(index)]['Bandwidth'].append(effBW)
-                            #retrieve effective number of channels
-                            effNChan = spwElem[i].findall(favNS + \
-                                           '}effectiveNumberOfChannels')[0].text
-                            #TDM or FDM?
-                            if effNChan == '128' or effNChan == '124':
-                                tableInfo[sbName]['BB_' + \
-                                      str(index)]['Division Mode'].append('TDM')
-                            else:
-                                tableInfo[sbName]['BB_' + \
-                                      str(index)]['Division Mode'].append('FDM')
-                            tableInfo[sbName]['BB_' + \
-                                      str(index)]['N Channels'].append(effNChan)
-                            #retrieve channel averaging factor
-                            avgFact = spwElem[i].findall(favNS + \
-                                             '}spectralAveragingFactor')[0].text
-                            tableInfo[sbName]['BB_' + \
-                                        str(index)]['avgFactor'].append(avgFact)
+    #retrieve the band
+    freqSet = child.findall(favNS + '}FrequencySetup')[0]
+    tableInfo[sbName]['Band'] = freqSet.attrib['receiverBand'].split('_')[-1]
 
-                            #retrieve the approximate SPW rest frequency
-                            rFreq = spwElem[i].findall(favNS + '}SpectralLine')
-                            rfElem = rFreq[0].findall(favNS + \
-                                                      '}restFrequency')[0]
-                            effRF = rfElem.text
-                            effRF = float(effRF)
-                            effRF = '%7.3f'%effRF
-                            tableInfo[sbName]['BB_' + \
-                                  str(index)]['restFrequency'].append(effRF)
+    #retrieve BaseBandSpecification center frequencies and part IDs
+    entityIDs = list()
+    bbSpecFreqs = list()
+    for BB in freqSet.findall(favNS + '}BaseBandSpecification'):
+        entityIDs.append(BB.attrib['entityPartId'])
+        bbSpecFreqs.append(BB.findall(favNS + '}centerFrequency')[0].text)
+        if BB.findall(favNS + '}centerFrequency')[0].attrib['unit'] == 'MHz':
+            bbSpecFreqs[-1] = float(bbSpecFreqs[-1])/1e3
+        elif BB.findall(favNS + '}centerFrequency')[0].attrib['unit'] == 'GHz':
+            bbSpecFreqs[-1] = float(bbSpecFreqs[-1])
+        else:
+            print "I don't know how to handle " + \
+                  BB.findall(favNS + '}centerFrequency')[0].attrib['unit'] + \
+                  " as a unit for the SPW center frequency. Look for a " + \
+                  "center frequency that is really negative to determine " + \
+                  "which baseband(s) need attention."
+            bbSpecFreqs[-1] = float(-1e25)
 
-                        index += 1
+    #retrieve appropriate CorrelatorConfiguration (BL or ACA)
+    corrPrefx = 'BL'
+    if len(child.findall(favNS + '}' + corrPrefx + \
+           'CorrelatorConfiguration')) == 0: corrPrefx = 'ACA'
+    corrConfig = child.findall(favNS + '}' + corrPrefx + \
+                               'CorrelatorConfiguration')[0]
+    tableInfo[sbName]['N Basebands'] = \
+        len(corrConfig.findall(favNS + '}' + corrPrefx + 'BaseBandConfig'))
+
+    #retrieve baseband configuration information
+    index = 1
+    for BB in corrConfig.findall(favNS + '}' + corrPrefx + 'BaseBandConfig'):
+        tableInfo[sbName]['BB_' + str(index)] = {'Bandwidth': list(), \
+                                                 'restFrequency': list(), \
+                                                 'avgFactor': list(), \
+                                                 'N Channels': list(), \
+                                                 'Division Mode': list()}
+        spwElem = BB.findall(favNS + '}' + corrPrefx + 'SpectralWindow')
+        polAtt = spwElem[0].attrib['polnProducts']
+        if polAtt == 'XX':
+            tableInfo[sbName]['Polarization State'] = 'Single'
+        elif polAtt == 'XX,YY':
+            tableInfo[sbName]['Polarization State'] = 'Dual'
+        elif polAtt == 'XX,YY,XY,YX':
+            tableInfo[sbName]['Polarization State'] = 'Full'
+        else:
+            print 'Unrecognized polarization products, this needs a closer look.'
+
+        #retrieve base band partID and sideband
+        partID = BB.findall(favNS + \
+                            '}BaseBandSpecificationRef')[0].attrib['partId']
+        sideBand = spwElem[0].attrib['sideBand']
+
+        freqs = list()
+        for i in range(len(spwElem)):
+            #retrieve effective bandwidth
+            bwElem = spwElem[i].findall(favNS + '}effectiveBandwidth')[0]
+            effBW = bwElem.text
+            unit = bwElem.attrib['unit']
+            if unit == 'GHz':
+                effBW = float(effBW)*1.0e3
+            elif unit == 'MHz':
+                effBW = float(effBW)
+            else:
+                effBW = -9999.9999
+                print "I don't know how to handle " + unit + " as a unit " + \
+                      "for the effective bandwidth. Look for a bandwidth " + \
+                      "of -999.999 in the output table to tell which " + \
+                      "baseband(s) need attention."
+            effBW = '%4.3f'%effBW
+            tableInfo[sbName]['BB_' + str(index)]['Bandwidth'].append(effBW)
+
+            #retrieve effective number of channels
+            effNChan = spwElem[i].findall(favNS + \
+                           '}effectiveNumberOfChannels')[0].text
+
+            #TDM or FDM?
+            if effNChan == '128' or effNChan == '124':
+                tableInfo[sbName]['BB_' + \
+                      str(index)]['Division Mode'].append('TDM')
+            else:
+                tableInfo[sbName]['BB_' + \
+                      str(index)]['Division Mode'].append('FDM')
+            tableInfo[sbName]['BB_' + \
+                      str(index)]['N Channels'].append(effNChan)
+
+            #retrieve channel averaging factor
+            avgFact = spwElem[i].findall(favNS + \
+                             '}spectralAveragingFactor')[0].text
+            tableInfo[sbName]['BB_' + \
+                        str(index)]['avgFactor'].append(avgFact)
+
+            #retrieve the SPW offset
+            centElem = spwElem[i].findall(favNS + '}centerFrequency')[0]
+            freqs.append(centElem.text)
+            if centElem.attrib['unit'] == 'MHz':
+                freqs[-1] = float(freqs[-1])/1e3
+            elif centElem.attrib['unit'] == 'GHz':
+                freqs[-1] = float(freqs[-1])
+            else:
+                print "I don't know how to handle " + \
+                      centElem.attrib['unit'] + " as a unit " + \
+                      "for the SPW center frequency. Look for a center " + \
+                      "frequency that is really negative to determine which" + \
+                      "baseband(s) need attention."
+                freqs[-1] = float(-1e25)
+
+            #retrieve the approximate SPW rest frequency
+#            rFreq = spwElem[i].findall(favNS + '}SpectralLine')
+#            rfElem = rFreq[0].findall(favNS + '}restFrequency')[0]
+#            effRF = rfElem.text
+#            effRF = float(effRF)
+#            effRF = '%7.3f'%effRF
+#            tableInfo[sbName]['BB_' + str(index)]['restFrequency'].append(effRF)
+
+        #calculate SPW center frequencies
+        for i in range(len(entityIDs)):
+            if entityIDs[i] == partID:
+               ind = i
+               break
+        for i in range(len(freqs)):
+            if sideBand == 'USB':
+                if freqs[i] > 3.0:
+                    junkie = bbSpecFreqs[ind] + abs(freqs[i] - 3.0)
+                else:
+                    junkie = bbSpecFreqs[ind] - abs(freqs[i] - 3.0)
+            else:
+                if freqs[i] > 3.0:
+                    junkie = bbSpecFreqs[ind] - abs(freqs[i] - 3.0)
+                else:
+                    junkie = bbSpecFreqs[ind] + abs(freqs[i] - 3.0)
+            print junkie
+            tableInfo[sbName]['BB_' + str(index)]['restFrequency'].append('%7.3f'%junkie)
+        index += 1
 
     #retrieve the time on source per execution and total time on source
     for child in root:
