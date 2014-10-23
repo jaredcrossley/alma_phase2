@@ -1,8 +1,8 @@
 --ALMA Phase 2 Scripts--
 
-########################
+#########################
 ##make_summary_table.py##
-########################
+#########################
 
 This script is meant to read in an AOT file that has been prepared by a member
 of P2G and output a table summarizing the SB setup of the project. This is
