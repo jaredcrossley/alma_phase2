@@ -1,1 +1,49 @@
-ALMA Phase 2 Scripts
+--ALMA Phase 2 Scripts--
+
+########################
+##make_summary_table.py##
+########################
+
+This script is meant to read in an AOT file that has been prepared by a member
+of P2G and output a table summarizing the SB setup of the project. This is
+accomplished by internally unzipping the AOT file (it's really an archive),
+reading the constituent SchedBlock and ObsProject XML files, parsing the
+information of interest, printing that information in a pleasant format to the
+terminal and deleting the unzipped contents of the AOT file. The AOT file is
+**NOT** modified in any way.
+
+A current (as of October 23, 2014) drawback of this script is that it is simply
+my (nbrunett) reverse engineering of the XML files. While I have received some
+advice from Alan Bridger this sometimes results in the SPW center frequencies
+being different from those displayed in the OT GUI by ~10 MHz.
+
+###################################
+##QUICK START: make_summary_table##
+###################################
+
+To use this script, find the path to the AOT file you wish to generate a table
+from and run Python on this script.
+
+Example 1: AOT file is in the current directory and called
+           "2013.1.00114.S_v1.aot"
+
+  >python make_summary_table.py
+  Enter path to aot file ("Q" to quit)
+  ==>2013.1.00114.S_v1.aot
+  
+Example 2: AOT file is in /export/data_1/nbrunett/downloads/ directory
+
+  >python make_summary_table.py
+  Enter path to aot file ("Q" to quit)
+  ==>/export/data_1/nbrunett/downloads/2013.1.00114.S_v1.aot
+  
+Example 3: AOT file is in another directory called "stuff" in the parent
+           directory of current directory
+           
+  >python make_summary_table.py
+  Enter path to aot file ("Q" to quit)
+  ==>../stuff/2013.1.00114.S_v1.aot
+  
+Examole 4: AOT path can be specified in the call to Python as well
+
+  >python make_summary_table.py ../stuff/2013.1.00114.S_v1.aot
