@@ -44,6 +44,6 @@ Example 3: AOT file is in another directory called "stuff" in the parent
   Enter path to aot file ("Q" to quit)
   ==>../stuff/2013.1.00114.S_v1.aot
   
-Examole 4: AOT path can be specified in the call to Python as well
+Example 4: AOT path can be specified in the call to Python as well
 
   >python make_summary_table.py ../stuff/2013.1.00114.S_v1.aot
