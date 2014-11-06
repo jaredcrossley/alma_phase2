@@ -323,7 +323,6 @@ for sb in sbXMLFiles:
                     junkie = bbSpecFreqs[ind] - abs(freqs[i] - 3.0)
                 else:
                     junkie = bbSpecFreqs[ind] + abs(freqs[i] - 3.0)
-            print junkie
             tableInfo[sbName]['BB_' + str(index)]['restFrequency'].append('%7.3f'%junkie)
         index += 1
 
