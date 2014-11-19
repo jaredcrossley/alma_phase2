@@ -269,7 +269,7 @@ for sb in sbXMLFiles:
                            '}effectiveNumberOfChannels')[0].text
 
             #TDM or FDM?
-            if effNChan == '128' or effNChan == '124':
+            if int(effNChan) <= 128 and float(effBW) > 1900.0:
                 tableInfo[sbName]['BB_' + \
                       str(index)]['Division Mode'].append('TDM')
             else:
