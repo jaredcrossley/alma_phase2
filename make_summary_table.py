@@ -382,7 +382,7 @@ for sbName in tableInfo['Ordered SBs']:
         else:
             print 'WARNING: could not determine array and correlator ' + \
                   'from SB name.'
-    elif sbName[-2] == '7M':
+    elif sbName[-2:] == '7M':
         print 'Array and Correlator: 7m, ACA Correlator'
     else:
         print 'WARNING: could not determine array and correlator ' + \
