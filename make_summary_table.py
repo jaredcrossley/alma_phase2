@@ -379,6 +379,8 @@ for sbName in tableInfo['Ordered SBs']:
             print 'Array and Correlator: 12m' + ' extended'*mixed + ', Baseline Correlator'
         elif sbName[-1] == 'C':
             print 'Array and Correlator: 12m' + ' compact'*mixed + ', Baseline Correlator'
+        elif sbName[-1] == 'P':
+            print 'Array and Correlator: 7m, Single Dish Autocorrelation'
         else:
             print 'WARNING: could not determine array and correlator ' + \
                   'from SB name.'
