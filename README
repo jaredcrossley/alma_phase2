@@ -15,7 +15,13 @@ terminal and deleting the unzipped contents of the AOT file. The AOT file is
 A current (as of October 23, 2014) drawback of this script is that it is simply
 my (nbrunett) reverse engineering of the XML files. While I have received some
 advice from Alan Bridger this sometimes results in the SPW center frequencies
-being different from those displayed in the OT GUI by ~10 MHz.
+being different from those displayed in the OT GUI by ~10 MHz. We have also
+noted some SBs where the number of channels is still incorrect.
+
+As of April 10, 2015, pfisher is doing most of the work with this script and
+has been asked to check the coordinates, center frequencies and number of
+channels against the values reported in the OT. These are comprehensive
+checks where each SB is compared for each project where a table is created.
 
 ###################################
 ##QUICK START: make_summary_table##
