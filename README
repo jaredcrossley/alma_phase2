@@ -53,3 +53,13 @@ Example 3: AOT file is in another directory called "stuff" in the parent
 Example 4: AOT path can be specified in the call to Python as well
 
   >python make_summary_table.py ../stuff/2013.1.00114.S_v1.aot
+
+#############
+##p2gTable2##
+#############
+
+These scripts are used by the Phase 2 Group (P2G) to generate the
+table that is included at the top of the project preparation SCOPS
+tickets. It uses the AOT file and is intended for use on Cycle 2
+projects. Documentation can be found on SCOPS-937.
+
